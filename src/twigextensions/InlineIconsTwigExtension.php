@@ -74,6 +74,15 @@ class InlineIconsTwigExtension extends \Twig_Extension
         $role = is_string($alt) ? 'image' : 'presentation';
         $titleid = uniqid('icon-'. $icon . '-label-');
 
+        $attributes = [];
+        $attributes['class'] = $class;
+        $attributes['role'] = $role;
+        $attributes['focusable'] = 'false';
+
+        if ($role === 'image') {
+            $attributes['aria-labelledby'] = $titleid;
+        }
+
         if ($inline) {
             $path = Craft::getAlias('@webroot') . $path;
             $svgCacheKey = $path . '#icon-' . $icon;
@@ -106,12 +115,18 @@ class InlineIconsTwigExtension extends \Twig_Extension
                         $innerHTML .= $child->ownerDocument->saveXML($child);
                     }
 
-                    $inlineSVG = '
-                        <svg class="' . $class . '" focusable="false" aria-labelledby="' . $titleid . '" role="' . $role . '" viewBox=' . $viewBox .'>
-                            <title id="' . $titleid . '">'. $alt . '</title>
-                            ' . $innerHTML . '
-                        </svg>
-                    ';
+                    $attributes['viewBox'] = $viewBox;
+
+                    $stringifiedAttributes = '';
+
+                    foreach ($attributes as $key => $value) {
+                        $stringifiedAttributes .= ' ' . $key . '="' . (string) $value . '"';
+                    }
+
+                    $inlineSVG  = '<svg' . $stringifiedAttributes .'>';
+                    $inlineSVG .= (($role === 'image') ? '<title id="' . $titleid . '">'. $alt . '</title>' : '');
+                    $inlineSVG .= $innerHTML;
+                    $inlineSVG .= '</svg>';
 
                     $this->cachedSVG[$svgCacheKey] = $inlineSVG;
 
@@ -120,11 +135,17 @@ class InlineIconsTwigExtension extends \Twig_Extension
             }
         }
 
-        return '
-            <svg class="' . $class . '" focusable="false" aria-labelledby="' . $titleid . '" role="' . $role . '">
-                <title id="' . $titleid . '">'. $alt . '</title>
-                <use xlink:href="' . $path . '#icon-' . strtolower($icon) .'"></use>
-            </svg>
-        ';
+        $stringifiedAttributes = '';
+
+        foreach ($attributes as $key => $value) {
+            $stringifiedAttributes .= ' ' . $key . '="' . (string) $value . '"';
+        }
+
+        $svg  = '<svg' . $stringifiedAttributes .'>';
+        $svg .= (($role === 'image') ? '<title id="' . $titleid . '">'. $alt . '</title>' : '');
+        $svg .= '<use xlink:href="' . $path . '#icon-' . strtolower($icon) .'"></use>';
+        $svg .= '</svg>';
+
+        return $svg;
     }
 }
