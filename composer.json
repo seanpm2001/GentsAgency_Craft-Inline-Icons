@@ -1,0 +1,38 @@
+{
+    "name": "gentsagency/craft-inline-icons",
+    "description": "Inline Icons",
+    "type": "craft-plugin",
+    "version": "0.1.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "inline icons"
+    ],
+    "support": {
+        "docs": "https://github.com/gentsagency/craft-inline-icons/blob/master/README.md",
+        "issues": "https://github.com/gentsagency/craft-inline-icons/issues"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Pieter Beulque",
+            "homepage": "https://github.com/pieterbeulque"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0-RC1"
+    },
+    "autoload": {
+        "psr-4": {
+          "gentsagency\\inlineicons\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Inline Icons",
+        "handle": "inline-icons",
+        "changelogUrl": "https://raw.githubusercontent.com/gentsagency/craft-inline-icons/master/CHANGELOG.md",
+        "class": "gentsagency\\inlineicons\\InlineIcons"
+    }
+}
