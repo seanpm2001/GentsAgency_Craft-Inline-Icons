@@ -72,3 +72,9 @@ You can pass these options to the Twig function.
  - `inline (default: false)`: when set to true, the SVG will be parsed by the PHP and embedded in the code
  - `alt (default: icon name)`: use this to override the text read by screen readers; set to `false` to hide the icon from screen readers
  - `path (default: '/assets/icons/icons.svg')`: where the SVG icon spritesheet lives, gets prepended with `@webroot`
+ 
+ ## Caveats
+ 
+When using `inline: false` (the default), icons will not show up in Internet Explorer unless you include the [svg4everybody](https://github.com/jonathantneal/svg4everybody) polyfill.
+ 
+ Inlined icons will work everywhere and give you some more styling options. Be aware that parsing the SVG in PHP might impact server performance. Use sparingly and with care!
