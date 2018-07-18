@@ -1,4 +1,4 @@
-# Inline Icons module for Craft CMS 3.x
+![Craft Inline Icons](resources/img/plugin-logo.png)
 
 A Twig helper for SVG icons
 
