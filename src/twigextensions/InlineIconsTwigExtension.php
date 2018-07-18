@@ -72,59 +72,78 @@ class InlineIconsTwigExtension extends \Twig_Extension
         $path = !empty($options['path']) ? $options['path'] : '/assets/icons/icons.svg';
         $alt = isset($options['alt']) ? $options['alt'] : $icon;
         $role = is_string($alt) ? 'image' : 'presentation';
-        $titleid = uniqid('icon-'. $icon . '-label-');
+
+        $attributes = [];
+        $attributes['class'] = $class;
+        $attributes['role'] = $role;
+        $attributes['focusable'] = 'false';
+
+        if ($role === 'image') {
+            $titleid = uniqid('icon-'. $icon . '-label-');
+            $attributes['aria-labelledby'] = $titleid;
+        }
 
         if ($inline) {
             $path = Craft::getAlias('@webroot') . $path;
             $svgCacheKey = $path . '#icon-' . $icon;
 
             if (isset($this->cachedSVG[$svgCacheKey])) {
-                return $this->cachedSVG[$svgCacheKey];
-            }
-
-            if (isset($this->cachedDocuments[$path])) {
-                $document = $this->cachedDocuments[$path];
+                $cached = $this->cachedSVG[$svgCacheKey];
+                $viewBox = $cached['viewBox'];
+                $innerHTML = $cached['innerHTML'];
             } else {
-                $svg = @file_get_contents($path);
-                $document = new \DOMDocument();
-                @$document->loadXML($svg);
-                $this->cachedDocuments[$path] = $document;
-            }
+                if (isset($this->cachedDocuments[$path])) {
+                    $document = $this->cachedDocuments[$path];
+                } else {
+                    $svg = @file_get_contents($path);
+                    $document = new \DOMDocument();
+                    @$document->loadXML($svg);
+                    $this->cachedDocuments[$path] = $document;
+                }
 
-            $symbols = $document->getElementsByTagName('symbol');
+                $symbols = $document->getElementsByTagName('symbol');
 
-            for ($i = 0; $i < $symbols->count(); $i++) {
-                $symbol = $symbols->item($i);
+                for ($i = 0; $i < $symbols->count(); $i++) {
+                    $symbol = $symbols->item($i);
 
-                if ($symbol->getAttribute('id') === 'icon-' . $icon) {
-                    $viewBox = $symbol->getAttribute('viewBox');
-                    $innerHTML = '';
+                    if ($symbol->getAttribute('id') === 'icon-' . $icon) {
+                        $viewBox = $symbol->getAttribute('viewBox');
+                        $innerHTML = '';
 
-                    $children = $symbol->childNodes;
+                        $children = $symbol->childNodes;
 
-                    foreach ($children as $child) {
-                        $innerHTML .= $child->ownerDocument->saveXML($child);
+                        foreach ($children as $child) {
+                            $innerHTML .= $child->ownerDocument->saveXML($child);
+                        }
+
+                        break;
                     }
-
-                    $inlineSVG = '
-                        <svg class="' . $class . '" focusable="false" aria-labelledby="' . $titleid . '" role="' . $role . '" viewBox=' . $viewBox .'>
-                            <title id="' . $titleid . '">'. $alt . '</title>
-                            ' . $innerHTML . '
-                        </svg>
-                    ';
-
-                    $this->cachedSVG[$svgCacheKey] = $inlineSVG;
-
-                    return $inlineSVG;
                 }
             }
+
+            $attributes['viewBox'] = $viewBox;
+        } else {
+            $innerHTML = '<use xlink:href="' . $path . '#icon-' . strtolower($icon) .'"></use>';
         }
 
-        return '
-            <svg class="' . $class . '" focusable="false" aria-labelledby="' . $titleid . '" role="' . $role . '">
-                <title id="' . $titleid . '">'. $alt . '</title>
-                <use xlink:href="' . $path . '#icon-' . strtolower($icon) .'"></use>
-            </svg>
-        ';
+        $stringifiedAttributes = '';
+
+        foreach ($attributes as $key => $value) {
+            $stringifiedAttributes .= ' ' . $key . '="' . (string) $value . '"';
+        }
+
+        $svg  = '<svg' . $stringifiedAttributes .'>';
+        $svg .= ($role === 'image') ? '<title id="' . $titleid . '">'. $alt . '</title>' : '';
+        $svg .= $innerHTML;
+        $svg .= '</svg>';
+
+        if (isset($svgCacheKey)) {
+            $this->cachedSVG[$svgCacheKey] = array(
+                'viewBox' => $viewBox,
+                'innerHTML' => $innerHTML,
+            );
+        }
+
+        return $svg;
     }
 }
