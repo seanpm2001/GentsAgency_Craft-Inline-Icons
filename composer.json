@@ -1,6 +1,6 @@
 {
     "name": "gentsagency/craft-inline-icons",
-    "description": "Inline Icons",
+    "description": "A Twig helper for SVG icons.",
     "type": "craft-plugin",
     "version": "0.1.1",
     "keywords": [
