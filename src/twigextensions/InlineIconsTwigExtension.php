@@ -76,7 +76,7 @@ class InlineIconsTwigExtension extends \Twig_Extension
         $attributes = [];
         $attributes['class'] = $class;
         $attributes['role'] = $role;
-        $attributes['focusable'] = 'false';
+        $attributes['focusable'] = empty($alt) ? 'false' : 'true';
 
         if ($role === 'image') {
             $titleid = uniqid('icon-'. $icon . '-label-');
