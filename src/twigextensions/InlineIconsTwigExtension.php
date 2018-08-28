@@ -103,7 +103,7 @@ class InlineIconsTwigExtension extends \Twig_Extension
 
                 $symbols = $document->getElementsByTagName('symbol');
 
-                for ($i = 0; $i < $symbols->count(); $i++) {
+                for ($i = 0; $i < $symbols->length; $i++) {
                     $symbol = $symbols->item($i);
 
                     if ($symbol->getAttribute('id') === 'icon-' . $icon) {
