@@ -71,16 +71,15 @@ class InlineIconsTwigExtension extends \Twig_Extension
         $inline = isset($options['inline']) ? (bool) $options['inline'] : false;
         $path = !empty($options['path']) ? $options['path'] : '/assets/icons/icons.svg';
         $alt = isset($options['alt']) ? $options['alt'] : $icon;
-        $role = is_string($alt) ? 'image' : 'presentation';
+        $role = is_string($alt) ? 'img' : 'presentation';
 
         $attributes = [];
         $attributes['class'] = $class;
         $attributes['role'] = $role;
         $attributes['focusable'] = empty($alt) ? 'false' : 'true';
 
-        if ($role === 'image') {
-            $titleid = uniqid('icon-'. $icon . '-label-');
-            $attributes['aria-labelledby'] = $titleid;
+        if ($role === 'img') {
+            $attributes['aria-label'] = $alt;
         }
 
         if ($inline) {
@@ -133,7 +132,6 @@ class InlineIconsTwigExtension extends \Twig_Extension
         }
 
         $svg  = '<svg' . $stringifiedAttributes .'>';
-        $svg .= ($role === 'image') ? '<title id="' . $titleid . '">'. $alt . '</title>' : '';
         $svg .= $innerHTML;
         $svg .= '</svg>';
 
